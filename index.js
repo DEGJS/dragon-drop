@@ -79,6 +79,11 @@ export default class DragonDrop {
    * @option {String} inactiveClass - The class to be added to all of the other
    *                                  items when an item is being dragged. Defaults
    *                                  to `'dragon-inactive'`.
+   * @option {Boolean} hasMultiLists - If there are multiple lists with drag and drop functionality.
+   *                                   Used if items can be dragged between lists.
+   *                                   Requires "firstListSelector" and "secondListSelector" options.
+   * @option {String} firstListSelector - selector for first list container
+   * @option {String} secondListSelector - selector for second list container
    * @option {Object} annnouncement - The configuration object for live region announcements
    * @option {Function} announcement.grabbed - The function called when an item is picked up.
    *                                           The currently grabbed element along with an
@@ -115,7 +120,8 @@ export default class DragonDrop {
         moves: (_, __, h) => matches(h, handle)
       };
       // init mouse drag via dragula
-      this.dragula = dragula([container], {
+      const containerEl = userOptions.dragulaOptions.containers || [container];
+      this.dragula = dragula(containerEl, {
         ...userOptions.dragulaOptions,
         ...dragulaOpts
       });
@@ -132,7 +138,7 @@ export default class DragonDrop {
 
     // initialize elements / events
     this
-      .initElements(container)
+      .initElements(container, userOptions)
       .mouseEvents();
 
     debug('dragon initialized: ', this);
@@ -215,7 +221,7 @@ export default class DragonDrop {
    * Sets all element refs
    * @param {HTMLElement} container the containing element
    */
-  initElements(container) {
+  initElements(container, userOptions) {
     this.container = container;
     this.setItems().initClick();
 
@@ -229,8 +235,8 @@ export default class DragonDrop {
       }
 
       // events
-      handle.removeEventListener('keydown', this.onKeydown);
-      handle.addEventListener('keydown', this.onKeydown);
+      handle.removeEventListener('keydown', e => this.onKeydown(e, userOptions));
+      handle.addEventListener('keydown', e => this.onKeydown(e, userOptions));
     });
 
     return this;
@@ -246,7 +252,7 @@ export default class DragonDrop {
     return this;
   }
 
-  onKeydown(e) {
+  onKeydown(e, userOptions) {
     const { nested } = this.options;
     const { target, which } = e;
     const isDrag = () => target.getAttribute('data-drag-on') === 'true';
@@ -265,7 +271,7 @@ export default class DragonDrop {
       case 40:
         if (isDrag()) {
           e.preventDefault();
-          this.arrow(which, target);
+          this.arrow(which, target, userOptions);
         }
 
         break;
@@ -285,7 +291,7 @@ export default class DragonDrop {
     return this;
   }
 
-  arrow(which, target) {
+  arrow(which, target, userOptions) {
     const handles = this.handles;
     const items = this.items;
     const isUp = which === 37 || which === 38;
@@ -301,8 +307,24 @@ export default class DragonDrop {
     const newItem = items[adjacentIndex];
     const refNode = isUp ? newItem : newItem.nextElementSibling;
     // move the item in the DOM
-    oldItem.parentNode.insertBefore(oldItem, refNode);
-
+    if (userOptions.hasMultiLists) {
+      try {
+        oldItem.parentNode.insertBefore(oldItem, refNode);
+      } catch (e) {
+        if (isUp) {
+          // need to move from excluded into included section
+          const includedContainer = this.container.querySelector(userOptions.firstListSelector);
+          includedContainer.insertBefore(oldItem, null);
+        } else {
+          // need to move from included to excluded
+          const excludedContainer = this.container.querySelector(userOptions.secondListSelector);
+          excludedContainer.insertBefore(oldItem, excludedContainer.childNodes[0]);
+        }
+      }
+    } else {
+      oldItem.parentNode.insertBefore(oldItem, refNode);
+    }
+    
     target.focus();
     this
       .setItems()
@@ -358,6 +380,3 @@ export default class DragonDrop {
     return this;
   }
 }
-
-// make window.DragonDrop available rather than window.DragonDrop.default
-module.exports = DragonDrop;
