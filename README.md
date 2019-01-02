@@ -128,6 +128,21 @@ The class to be added to all of the other items when an item is being dragged. D
 'dragon-inactive'
 ```
 
+##### `hasMultiLists` _Boolean_
+
+If there are multiple lists with drag and drop functionality.
+Used if items can be dragged between lists.
+Requires "firstListSelector" and "secondListSelector" options.
+
+
+##### `firstListSelector` _String_
+
+Selector for first list container. Used with `hasMultiLists`.
+
+##### `secondListSelector` _String_
+
+Selector for second list container. Used with `hasMultiLists`.
+
 ##### `nested` _Boolean_
 
 Set to true if nested lists are being used (click and keydown events will not bubble up (`e.stopPropagation()` will be applied)). For nested lists, you MUST pass `DragonDrop` an array of containers as the 1st parameter (see example below).

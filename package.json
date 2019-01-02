@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npm run pre-build && npm run bundle && npm run bundle:min && npm run demo",
     "bundle": "rollup -c",
-    "bundle:min": "browserify -g uglifyify index.js -o dist/dragon-drop.min.js --standalone DragonDrop -t [ babelify --presets [ env stage-0 ] ]",
+    "bundle:min": "rollup -c rollup-min.config.js",
     "clean": "rm -rf dist/",
     "demo": "mkdir dist/demo && cp-dir ./demo ./dist/demo",
     "deploy": "gh-pages -m 'auto commit [ci skip]' -d dist/",
@@ -48,6 +48,7 @@
     "rollup-plugin-babel": "^3.0.7",
     "rollup-plugin-commonjs": "^9.2.0",
     "rollup-plugin-node-resolve": "^4.0.0",
+    "rollup-plugin-uglify": "^6.0.0",
     "simulant": "^0.2.2",
     "sinon": "^6.1.5",
     "tap-spec": "^4.1.1",
