@@ -74,6 +74,16 @@
 	  };
 	}();
 
+	var toConsumableArray = function (arr) {
+	  if (Array.isArray(arr)) {
+	    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+	    return arr2;
+	  } else {
+	    return Array.from(arr);
+	  }
+	};
+
 	var _isObject = function _isObject(it) {
 	  return (typeof it === 'undefined' ? 'undefined' : _typeof(it)) === 'object' ? it !== null : typeof it === 'function';
 	};
@@ -7843,7 +7853,9 @@
 	      var _options2 = this.options,
 	          activeClass = _options2.activeClass,
 	          inactiveClass = _options2.inactiveClass,
-	          nested = _options2.nested;
+	          nested = _options2.nested,
+	          hasMultiLists = _options2.hasMultiLists,
+	          dragulaOptions = _options2.dragulaOptions;
 
 
 	      this.handles.forEach(function (handle) {
@@ -7888,7 +7900,20 @@
 
 	          if (!wasPressed) {
 	            // cache the initial order to allow for escape cancellation
-	            _this.cachedItems = queryAll(_this.options.item, _this.container);
+	            if (hasMultiLists) {
+	              var dragulaContainerList = Array.isArray(dragulaOptions.containers) ? dragulaOptions.containers : [dragulaOptions.containers];
+	              _this.cachedItemList = dragulaContainerList.map(function (c) {
+	                return {
+	                  containerEl: c,
+	                  items: queryAll(_this.options.item, c)
+	                };
+	              });
+	            } else {
+	              _this.cachedItemList = [{
+	                containerEl: _this.container,
+	                items: queryAll(_this.options.item, _this.container)
+	              }];
+	            }
 	          }
 	        });
 
@@ -8064,15 +8089,22 @@
 	  }, {
 	    key: 'cancel',
 	    value: function cancel() {
-	      var _this4 = this;
-
 	      // cache active element so it can be focused after reorder
 	      var focused = document.activeElement;
 	      // restore the order of the list
-	      this.cachedItems.forEach(function (item) {
-	        return _this4.container.appendChild(item);
+	      // this.cachedItems.forEach(item => this.container.appendChild(item));
+	      // this.items = this.cachedItems;
+	      this.cachedItemList.forEach(function (_ref) {
+	        var containerEl = _ref.containerEl,
+	            items = _ref.items;
+
+	        items.forEach(function (item) {
+	          return containerEl.appendChild(item);
+	        });
 	      });
-	      this.items = this.cachedItems;
+	      this.items = this.cachedItemList.reduce(function (accum, listItem) {
+	        return [].concat(toConsumableArray(accum), toConsumableArray(listItem.items));
+	      }, []);
 	      // ensure the handle stays focused
 	      focused.focus();
 	      this.announcement('cancel').emit('cancel').setItems();

@@ -3,7 +3,11 @@
 [![CircleCI](https://circleci.com/gh/schne324/dragon-drop.svg?style=svg)](https://circleci.com/gh/schne324/dragon-drop)
 
 Keyboard/assistive technology accessible drag-and-drop reorder list.
+
 _This repo is forked and edited from original to comply with a DEG client project_
+It's major changes include:
+* using rollup for bundling instead of browserify
+* support for multiple drag and drop lists where items can be dragged between lists
 
 <img alt="Dragon Drop" src="/demo/dragondrop_sticker.png" width="400" />
 

@@ -1,6 +1,6 @@
 {
   "name": "drag-on-drop",
-  "version": "3.4.0",
+  "version": "3.5.0",
   "description": "Accessible drag and drop list reorder",
   "main": "dist/dragon-drop.js",
   "scripts": {
@@ -34,8 +34,6 @@
     "babel-preset-env": "^1.7.0",
     "babel-preset-stage-0": "^6.24.1",
     "babel-register": "^6.26.0",
-    "babelify": "^7.3.0",
-    "browserify": "^14.4.0",
     "cp-dir": "^1.0.3",
     "debug": "^3.0.0",
     "eslint": "^4.19.1",

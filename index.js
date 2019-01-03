@@ -165,7 +165,7 @@ export default class DragonDrop {
   }
 
   initClick() {
-    const { activeClass, inactiveClass, nested } = this.options;
+    const { activeClass, inactiveClass, nested, hasMultiLists, dragulaOptions } = this.options;
 
     this.handles.forEach(handle => {
       if (this.handledHandles.includes(handle)) {
@@ -207,7 +207,20 @@ export default class DragonDrop {
 
         if (!wasPressed) {
           // cache the initial order to allow for escape cancellation
-          this.cachedItems = queryAll(this.options.item, this.container);
+          if (hasMultiLists) {
+            const dragulaContainerList = Array.isArray(dragulaOptions.containers) ? dragulaOptions.containers : [dragulaOptions.containers];
+            this.cachedItemList = dragulaContainerList.map(c => {
+              return {
+                containerEl: c,
+                items: queryAll(this.options.item, c)
+              }
+            });
+          } else {
+            this.cachedItemList = [{
+              containerEl: this.container,
+              items: queryAll(this.options.item, this.container)
+            }]
+          }
         }
       });
 
@@ -368,8 +381,12 @@ export default class DragonDrop {
     // cache active element so it can be focused after reorder
     const focused = document.activeElement;
     // restore the order of the list
-    this.cachedItems.forEach(item => this.container.appendChild(item));
-    this.items = this.cachedItems;
+    this.cachedItemList.forEach(({containerEl, items}) => {
+      items.forEach(item => containerEl.appendChild(item));
+    });
+    this.items = this.cachedItemList.reduce((accum, listItem ) => {
+      return [...accum, ...listItem.items];
+    }, []);
     // ensure the handle stays focused
     focused.focus();
     this
