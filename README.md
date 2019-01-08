@@ -23,25 +23,7 @@ For an in-depth look at dragon drop see the [smashing magazine article on dragon
 
 ## Installation
 
-## npm
-```bash
-$ npm install drag-on-drop
-```
-
-### bower
-```bash
-$ bower install drag-on-drop
-```
-
 ## Usage
-
-### Browserify/Webpack
-
-```js
-import DragonDrop from 'drag-on-drop';
-
-const dragon = new DragonDrop(container, options);
-```
 
 ### In the browser
 
