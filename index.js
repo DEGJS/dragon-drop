@@ -120,7 +120,7 @@ export default class DragonDrop {
         moves: (_, __, h) => matches(h, handle)
       };
       // init mouse drag via dragula
-      const containerEl = userOptions.dragulaOptions.containers || [container];
+      const containerEl = (userOptions.dragulaOptions && userOptions.dragulaOptions.containers) || [container];
       this.dragula = dragula(containerEl, {
         ...userOptions.dragulaOptions,
         ...dragulaOpts
